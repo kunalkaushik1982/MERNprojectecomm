@@ -7,12 +7,7 @@ const sendToken = require("../utils/jwtToken");
 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password } = req.body;
-  const user = await User.create({
-    name,
-    email,
-    password,
-    avatar: { public_id: "this is a sample id", url: "profilepicurl" },
-  });
+  const user = await User.create({name,email,password,avatar: { public_id: "this is a sample id", url: "profilepicurl" }});
   sendToken(user, 201, res);
 });
 
@@ -22,16 +17,12 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
 
   //Checking if user has entered both email and password
-  if (!email || !password) {
-    return next(new ErrorHander("Please Enter Email & Password", 400));
-  }
+  if (!email || !password) {return next(new ErrorHander("Please Enter Email & Password", 400));}
   const user = await User.findOne({ email: email }).select("+password");
-  if (!user) {
-    return next(new ErrorHander("Invalid Email & Password", 401));
+  if (!user) {return next(new ErrorHander("Invalid Email & Password", 401));
   }
   const isPasswordMatched = user.comparePassword(password);
-  if (!isPasswordMatched) {
-    return next(new ErrorHander("Invalid Email & Password", 401));
+  if (!isPasswordMatched) {return next(new ErrorHander("Invalid Email & Password", 401));
   }
   sendToken(user, 200, res);
 });
