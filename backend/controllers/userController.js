@@ -45,11 +45,7 @@ exports.forgetPassword = catchAsyncErrors(async (req,res,next)=>{
   const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/password/reset/${resetToken}`
   const message = `Your Password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, plese ignore it:`
   try {
-    await sendEmail({
-      email:user.email,
-      subject:`Ecommerce Password Recovery`,
-      message
-    })
+    await sendEmail({email:user.email,subject:`Ecommerce Password Recovery`,message })
     res.status(200).json({success:true,message:`Email sent to ${user.email} successfully`} )
   } catch (error) {
     user.resetPasswordToken = undefined
@@ -98,4 +94,19 @@ exports.updateProfile = catchAsyncErrors(async(req,res,next)=>{
   const newUserData ={name:req.body.name,email:req.body.email}
   const user = await User.findByIdAndUpdate(req.user.id,newUserData,{new:true,runValidators:true,useFindAndModify:false})
   res.status(200).json({success:true})
+})
+
+//Get All Users (admin)
+
+exports.getAllUser = catchAsyncErrors(async(req,res,next)=>{
+  const users = await User.find()
+  res.status(200).json({success:true,users})
+})
+
+//Get Single User (admin)
+
+exports.getSingleUser = catchAsyncErrors(async(req,res,next)=>{
+  const user = await User.findById(req.params.id)
+  if(!user){return next(new ErrorHander(`User doesn't exist with Id: ${req.params.id}`))}
+  res.status(200).json({success:true,user})
 })
